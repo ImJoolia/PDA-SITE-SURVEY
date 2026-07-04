@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SITE Survey 2026 — Public Design Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marqueeTrack"></div>
+  </div>
+
+  <header class="site-header">
+    <a class="wordmark" href="#">Public Design<br />Agency <span class="yay">— Yay!</span></a>
+    <nav class="header-links">
+      <a class="lock-link" href="admin.html" title="Staff sign-in" aria-label="Staff sign-in">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+        </svg>
+      </a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="heroSection">
+      <h1>Tell us about your visit.</h1>
+      <p>Your answers help us make SITE Santa Fe a better place to see, wander, and hang out. It takes about three minutes — promise.</p>
+      <svg class="squiggle" viewBox="0 0 130 14" aria-hidden="true"><path d="M2 7c8-8 16 8 24 0s16 8 24 0 16 8 24 0 16 8 24 0 16 8 24 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+    </section>
+
+    <div id="demoBanner" class="banner" hidden>
+      <strong>Demo mode.</strong> Firebase isn't connected yet, so answers won't be saved. See README.md for the two-minute setup.
+    </div>
+
+    <div id="loadError" class="banner banner--error" hidden>
+      Couldn't load the survey. Check your internet connection and refresh — if it keeps happening, let the survey owner know.
+    </div>
+
+    <form id="surveyForm" novalidate>
+      <div id="questions"></div>
+      <button type="button" class="btn" id="submitBtn">Submit my answers</button>
+      <p class="hint" style="margin-top:14px;">Questions marked <span class="req-star">*</span> are required.</p>
+    </form>
+
+    <section id="successView" class="success" hidden>
+      <svg class="squiggle" viewBox="0 0 130 14" aria-hidden="true"><path d="M2 7c8-8 16 8 24 0s16 8 24 0 16 8 24 0 16 8 24 0 16 8 24 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <h2>Yay! Thank you.</h2>
+      <p>Your answers are in. We read every single one.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    Made with 〰️ by Public Design Agency · SITE Survey 2026
+  </footer>
+
+  <script type="module" src="js/survey.js"></script>
+</body>
+</html>
