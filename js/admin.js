@@ -1,5 +1,5 @@
 import {
-  loadQuestions, saveQuestions, loadResponses,
+  loadQuestions, saveQuestions, loadResponses, deleteResponse, deleteAllResponses,
   getPasswordHash, setPasswordHash, seedDatabase, sha256, isDemo,
 } from "./db.js";
 import { EXAMPLE_IMAGE_QUESTION } from "./defaults.js";
@@ -100,7 +100,7 @@ async function openDashboard() {
 // ============================================================
 $$(".tab").forEach((tab) => tab.addEventListener("click", () => {
   $$(".tab").forEach((t) => t.setAttribute("aria-selected", t === tab ? "true" : "false"));
-  ["results", "builder", "settings"].forEach((name) => {
+  ["results", "responses", "builder", "settings"].forEach((name) => {
     $("#tab-" + name).hidden = name !== tab.dataset.tab;
   });
 }));
@@ -114,6 +114,7 @@ async function refreshResults() {
   RESPONSES = await loadResponses();
   renderStats();
   renderCharts();
+  renderResponseList();
 }
 
 function renderStats() {
@@ -269,6 +270,95 @@ function renderCharts() {
     }
   });
 }
+
+// ---------- Individual responses ----------
+$("#refreshRespBtn").addEventListener("click", refreshResults);
+
+function responseName(r) {
+  for (const q of QUESTIONS) {
+    if (q.type === "short" && r.answers?.[q.id]) return r.answers[q.id];
+  }
+  return "Anonymous response";
+}
+
+function renderResponseList() {
+  const holder = $("#respList");
+  holder.innerHTML = "";
+  $("#respStatus").textContent = RESPONSES.length ? "" : "No responses yet.";
+  RESPONSES.forEach((r) => {
+    const row = document.createElement("div");
+    row.className = "card resp-row";
+
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    const when = r.submittedAt ? new Date(r.submittedAt).toLocaleString() : "Unknown time";
+    summary.append(when + " \u2014 ");
+    const who = document.createElement("span");
+    who.className = "hint";
+    who.textContent = responseName(r);
+    summary.append(who);
+    details.append(summary);
+
+    const ul = document.createElement("ul");
+    ul.className = "resp-answers";
+    QUESTIONS.forEach((q) => {
+      const v = r.answers?.[q.id];
+      if (v === undefined || v === null || v === "") return;
+      const li = document.createElement("li");
+      const b = document.createElement("b");
+      b.textContent = q.title;
+      li.append(b);
+      let text = String(v);
+      const other = r.answers?.[q.id + "_other"];
+      if (v === "Other" && other) text += " \u2014 " + other;
+      li.append(text);
+      ul.append(li);
+    });
+    details.append(ul);
+    row.append(details);
+
+    const del = document.createElement("button");
+    del.className = "icon-btn";
+    del.title = "Delete this response";
+    del.setAttribute("aria-label", "Delete this response");
+    del.textContent = "\u2715";
+    del.addEventListener("click", async () => {
+      if (!confirm(`Delete the response from ${when}? This can't be undone.`)) return;
+      del.disabled = true;
+      try {
+        await deleteResponse(r.id);
+        await refreshResults();
+      } catch (err) {
+        console.error(err);
+        del.disabled = false;
+        alert("Couldn't delete \u2014 if you just added this feature, make sure the updated firestore.rules are published in the Firebase console.");
+      }
+    });
+    row.append(del);
+
+    holder.append(row);
+  });
+}
+
+$("#deleteAllBtn").addEventListener("click", async () => {
+  const n = RESPONSES.length;
+  if (!n) { $("#respStatus").textContent = "There are no responses to delete."; return; }
+  if (!confirm(`Delete ALL ${n} responses? This cannot be undone.`)) return;
+  if (!confirm("Last chance \u2014 really delete every response? Consider downloading the CSV first.")) return;
+  const btn = $("#deleteAllBtn");
+  btn.disabled = true;
+  btn.textContent = "Deleting...";
+  try {
+    await deleteAllResponses();
+    await refreshResults();
+    $("#respStatus").textContent = "All responses deleted.";
+  } catch (err) {
+    console.error(err);
+    alert("Couldn't delete everything \u2014 make sure the updated firestore.rules are published in the Firebase console, then try again.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Delete ALL responses";
+});
 
 // ---------- CSV export ----------
 $("#exportBtn").addEventListener("click", () => {

@@ -128,6 +128,27 @@ export async function loadResponses() {
     .sort((a, b) => (b.submittedAt || "").localeCompare(a.submittedAt || ""));
 }
 
+export async function deleteResponse(id) {
+  if (isDemo) {
+    demoStore.responses = (demoStore.responses || []).filter((r) => r.id !== id);
+    return;
+  }
+  await ensureFirebase();
+  await fs.deleteDoc(fs.doc(db, "responses", id));
+}
+
+export async function deleteAllResponses() {
+  if (isDemo) { demoStore.responses = []; return; }
+  await ensureFirebase();
+  const snap = await fs.getDocs(fs.collection(db, "responses"));
+  const docs = snap.docs;
+  for (let i = 0; i < docs.length; i += 400) {
+    const batch = fs.writeBatch(db);
+    docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  }
+}
+
 export async function getPasswordHash() {
   if (isDemo) {
     if (!demoStore.passwordHash) demoStore.passwordHash = await sha256(DEFAULT_PASSWORD);

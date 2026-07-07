@@ -8,11 +8,13 @@ service cloud.firestore {
       allow write: if true; // needed so the password-gated dashboard can edit questions
     }
 
-    // Visitors submit responses; they can never edit or delete them.
+    // Visitors submit responses; responses can be deleted from the
+    // staff dashboard, but never edited.
     match /responses/{r} {
       allow create: if true;
       allow read: if true;   // needed so the dashboard can chart results
-      allow update, delete: if false;
+      allow delete: if true; // needed so the dashboard can remove responses
+      allow update: if false;
     }
 
     // Stores the (hashed) team password.

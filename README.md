@@ -66,6 +66,11 @@ Everything lives in Firestore:
 - `meta/config` — a SHA-256 hash of the team password (the password itself is
   never stored or sent anywhere in plain text)
 
+The dashboard's **Responses** tab lists every submitted survey, newest first —
+open one to read it, delete it with the ✕ button, or use **Delete ALL responses**
+(double-confirmed) to clear the slate, e.g. after testing. Deletions are
+permanent, so grab the CSV from the Results tab first if in doubt.
+
 Any number of staff can use the dashboard at once — they all share the one password.
 
 ## An honest note about security
