@@ -46,6 +46,17 @@ Nothing is saved in demo mode.
 3. Your survey link is `https://YOUR-USERNAME.github.io/YOUR-REPO/` — that's what
    you send to clients. Staff use the lock icon (or add `/admin.html`).
 
+
+## Image-choice questions
+
+The Questions tab includes an **Image choice (pick one)** type: visitors tap one
+of 2–6 images. To build one, add a question (or press **+ Add the example image
+question** for a pre-made starter), then for each slot press **Upload**, pick a
+photo from your computer, and give it a short label — the label is what shows
+up in the results charts. Photos are automatically resized and stored inside
+the database itself, so there is nothing to host, link, or maintain. Results
+appear as a bar chart with a thumbnail legend underneath.
+
 ## How data is stored
 
 Everything lives in Firestore:
