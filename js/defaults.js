@@ -3,6 +3,26 @@
 
 export const DEFAULT_PASSWORD = "yaypda";
 
+// Tiny built-in placeholder images (SVG data URLs) for the example
+// image-choice question. Staff replace these with real photos via the
+// Upload button in the dashboard's Questions tab.
+const tile = (bg, shape) =>
+  "data:image/svg+xml," +
+  encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150"><rect width="200" height="150" fill="${bg}"/>${shape}</svg>`);
+
+export const EXAMPLE_IMAGE_QUESTION = {
+  id: "q16", order: 16, type: "imagechoice", required: false,
+  title: "Which image feels closest to how your visit felt?",
+  images: [
+    { label: "Calm",       src: tile("#0F416F", '<circle cx="100" cy="75" r="42" fill="#25BEC0"/>') },
+    { label: "Curious",    src: tile("#D7DF21", '<circle cx="66" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="100" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="134" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/>') },
+    { label: "Energized",  src: tile("#ED217C", '<path d="M20 110 L60 40 L100 110 L140 40 L180 110" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>') },
+    { label: "Reflective", src: tile("#25BEC0", '<path d="M45 130 A55 55 0 0 1 155 130 Z" fill="#ffffff"/>') },
+    { label: "Playful",    src: tile("#8685C0", '<g fill="#D7DF21"><circle cx="50" cy="45" r="12"/><circle cx="100" cy="45" r="12"/><circle cx="150" cy="45" r="12"/><circle cx="50" cy="105" r="12"/><circle cx="100" cy="105" r="12"/><circle cx="150" cy="105" r="12"/></g>') },
+    { label: "Rushed",     src: tile("#000000", '<g stroke="#D7DF21" stroke-width="9" stroke-linecap="round"><line x1="30" y1="120" x2="90" y2="30"/><line x1="80" y1="120" x2="140" y2="30"/><line x1="130" y1="120" x2="190" y2="30"/></g>') },
+  ],
+};
+
 export const DEFAULT_QUESTIONS = [
   {
     id: "q01", order: 1, type: "short", required: true,
@@ -76,4 +96,5 @@ export const DEFAULT_QUESTIONS = [
     title: "If uncomfortable, why?",
     placeholder: "Your answer",
   },
+  EXAMPLE_IMAGE_QUESTION,
 ];

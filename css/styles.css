@@ -1,30 +1,56 @@
 /* ============================================================
    PDA × SITE Santa Fe Survey — shared styles
-   Palette: paper / ink / sunbeam yellow / cobalt (+ chart hues)
-   Type: Zilla Slab (display, nods to the PDA slab wordmark)
-         Public Sans (body — a public-service typeface for a
-         Public Design Agency)
+   Palette: PDA brand colors (from the official contrast sheet)
+   Type: Josefin Sans (self-hosted, PDA brand font)
    ============================================================ */
 
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../assets/fonts/JosefinSans-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../assets/fonts/JosefinSans-Italic.woff2") format("woff2");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../assets/fonts/JosefinSans-SemiBold.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../assets/fonts/JosefinSans-Bold.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
 :root {
-  --paper: #fbf8f1;
+  /* PDA brand palette */
+  --pink: #ed217c;
+  --berry: #9f2064;
+  --navy: #0f416f;
+  --sky: #25aae1;
+  --pda-teal: #25bec0;
+  --green: #8cc63f;
+  --chartreuse: #d7df21;
+  --periwinkle: #8685c0;
+  --gray: #aaaaaa;
+  --gray-light: #d4d4d4;
+
+  --paper: #f6f6f4;
   --card: #ffffff;
-  --ink: #161514;
-  --ink-soft: #4c4a45;
-  --sun: #ffd23f;
-  --sun-soft: #ffe89a;
-  --cobalt: #2545d3;
-  --poppy: #ff5a3c;
-  --teal: #0fa47a;
-  --plum: #7a3fd1;
-  --danger: #c8341f;
+  --ink: #000000;
+  --ink-soft: #4c4c4c;
+  --chartreuse-soft: #f4f7c7;
+  --danger: #9f2064;
   --border: 2px solid var(--ink);
   --radius: 16px;
   --radius-sm: 10px;
   --shadow: 6px 6px 0 var(--ink);
   --shadow-sm: 4px 4px 0 var(--ink);
-  --font-display: "Zilla Slab", "Rockwell", serif;
-  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Josefin Sans", "Trebuchet MS", Verdana, sans-serif;
+  --font-body: "Josefin Sans", "Trebuchet MS", Verdana, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -36,14 +62,14 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ---------- Marquee band (the signature) ---------- */
 .marquee {
-  background: var(--sun);
+  background: var(--chartreuse);
   border-bottom: var(--border);
   overflow: hidden;
   white-space: nowrap;
@@ -77,15 +103,22 @@ body {
   justify-content: space-between;
   gap: 16px;
 }
-.wordmark {
+.logo-link { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo { height: 74px; width: auto; display: block; }
+@media (max-width: 560px) { .logo { height: 56px; } }
+.staff-badge {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.15rem;
-  line-height: 1.1;
-  text-decoration: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink);
+  background: var(--chartreuse);
+  border: var(--border);
+  border-radius: 999px;
+  padding: 5px 12px 3px;
 }
-.wordmark .yay { color: var(--cobalt); }
+
 .header-links { display: flex; align-items: center; gap: 12px; }
 .lock-link {
   display: inline-flex;
@@ -127,7 +160,7 @@ body {
   width: 130px;
   height: 14px;
   margin: 18px 0 26px;
-  color: var(--cobalt);
+  color: var(--pda-teal);
 }
 
 /* ---------- Cards ---------- */
@@ -140,7 +173,7 @@ body {
   margin-bottom: 26px;
 }
 .q-card { position: relative; }
-.q-card.q-error { outline: 3px solid var(--poppy); outline-offset: 3px; }
+.q-card.q-error { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 .q-top { display: flex; gap: 14px; align-items: flex-start; }
 .q-num {
@@ -150,7 +183,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--sun);
+  background: var(--chartreuse);
   border: var(--border);
   border-radius: 50%;
   font-family: var(--font-display);
@@ -164,7 +197,7 @@ body {
   line-height: 1.3;
   margin: 4px 0 0;
 }
-.req-star { color: var(--poppy); margin-left: 4px; }
+.req-star { color: var(--pink); margin-left: 4px; }
 .q-body { margin-top: 16px; }
 .q-error-msg {
   display: none;
@@ -193,7 +226,7 @@ select {
 }
 textarea { resize: vertical; min-height: 88px; }
 input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
-  outline: 3px solid var(--cobalt);
+  outline: 3px solid var(--navy);
   outline-offset: 2px;
 }
 
@@ -220,8 +253,8 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-
   border-radius: 50%;
   background: var(--card);
 }
-.choice.selected { background: var(--sun-soft); }
-.choice.selected .dot { background: var(--cobalt); box-shadow: inset 0 0 0 3px var(--card); }
+.choice.selected { background: var(--chartreuse-soft); }
+.choice.selected .dot { background: var(--pink); box-shadow: inset 0 0 0 3px var(--card); }
 .choice-row { display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; }
 .choice-row .choice { flex: 1 1 140px; justify-content: center; }
 .other-input { margin-top: 10px; display: none; }
@@ -245,7 +278,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-
   min-width: 44px;
   height: 34px;
   padding: 0 10px;
-  background: var(--sun);
+  background: var(--chartreuse);
   border: var(--border);
   border-radius: 999px;
   font-family: var(--font-display);
@@ -266,7 +299,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--sun);
+  background: var(--chartreuse);
   border: var(--border);
   cursor: grab;
 }
@@ -274,7 +307,7 @@ input[type="range"]::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--sun);
+  background: var(--chartreuse);
   border: var(--border);
   cursor: grab;
 }
@@ -306,7 +339,7 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: var(--shadow-sm);
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn--sun { background: var(--sun); color: var(--ink); }
+.btn--sun { background: var(--chartreuse); color: var(--ink); }
 .btn--ghost { background: var(--card); color: var(--ink); }
 .btn--sm { font-size: 0.9rem; padding: 8px 18px; }
 .btn--danger { background: var(--danger); }
@@ -320,13 +353,13 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.95rem;
   line-height: 1;
 }
-.icon-btn:hover { background: var(--sun-soft); }
+.icon-btn:hover { background: var(--chartreuse-soft); }
 
 /* ---------- Banners / notes ---------- */
 .banner {
   border: var(--border);
   border-radius: var(--radius-sm);
-  background: var(--sun-soft);
+  background: var(--chartreuse-soft);
   padding: 12px 16px;
   font-size: 0.92rem;
   margin-bottom: 22px;
@@ -357,7 +390,7 @@ input[type="range"]::-moz-range-thumb {
   padding: 8px 20px;
   cursor: pointer;
 }
-.tab[aria-selected="true"] { background: var(--sun); box-shadow: var(--shadow-sm); }
+.tab[aria-selected="true"] { background: var(--chartreuse); box-shadow: var(--shadow-sm); }
 
 .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
 .stat {
@@ -436,7 +469,7 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   gap: 12px;
   align-items: center;
-  background: var(--sun);
+  background: var(--chartreuse);
   border: var(--border);
   border-radius: 999px;
   box-shadow: var(--shadow-sm);
@@ -458,3 +491,57 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.85rem;
   color: var(--ink-soft);
 }
+
+/* ---------- Image choice (survey) ---------- */
+.img-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 560px) { .img-choices { grid-template-columns: repeat(2, 1fr); } }
+.img-choice {
+  padding: 0;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.img-choice:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.img-choice img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; border-bottom: var(--border); }
+.img-choice-label { padding: 8px 10px; font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+.img-choice.selected { outline: 3px solid var(--pink); outline-offset: 2px; }
+.img-choice.selected .img-choice-label { background: var(--chartreuse); }
+
+/* ---------- Image slots (builder) ---------- */
+.img-slots { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.img-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  background: var(--paper);
+}
+.img-slot-thumb { width: 72px; height: 54px; object-fit: cover; border: 1.5px solid var(--ink); border-radius: 6px; }
+.img-slot-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 54px;
+  border: 1.5px dashed var(--ink);
+  border-radius: 6px;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+.img-slot input[type="text"] { flex: 1 1 160px; width: auto; }
+
+/* ---------- Thumbnail legend under image-choice charts ---------- */
+.thumb-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.thumb-row figure { margin: 0; text-align: center; }
+.thumb-row img { width: 64px; height: 48px; object-fit: cover; border: 1.5px solid var(--ink); border-radius: 6px; display: block; }
+.thumb-row figcaption { font-size: 0.72rem; color: var(--ink-soft); margin-top: 3px; max-width: 72px; }

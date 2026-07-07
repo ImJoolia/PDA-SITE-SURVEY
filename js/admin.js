@@ -2,17 +2,18 @@ import {
   loadQuestions, saveQuestions, loadResponses,
   getPasswordHash, setPasswordHash, seedDatabase, sha256, isDemo,
 } from "./db.js";
+import { EXAMPLE_IMAGE_QUESTION } from "./defaults.js";
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 
 $("#marqueeTrack").textContent = "Staff only 〰️ Yay for data! 〰️ SITE Survey 2026 〰️ ".repeat(8);
 
-const PALETTE = ["#ffd23f", "#2545d3", "#ff5a3c", "#0fa47a", "#7a3fd1", "#161514", "#f2a4c0", "#8a8577"];
-const chartFont = { family: "'Public Sans', sans-serif", size: 12 };
+const PALETTE = ["#D7DF21", "#25BEC0", "#ED217C", "#25AAE1", "#8CC63F", "#8685C0", "#0F416F", "#9F2064"];
+const chartFont = { family: "'Josefin Sans', sans-serif", size: 12 };
 if (window.Chart) {
   Chart.defaults.font = chartFont;
-  Chart.defaults.color = "#161514";
+  Chart.defaults.color = "#000000";
 }
 
 let QUESTIONS = [];
@@ -176,9 +177,11 @@ function renderCharts() {
     box.append(canvas);
     card.append(box);
 
-    if (q.type === "yesno" || q.type === "multiple") {
-      const base = q.type === "yesno" ? ["Yes", "No"] : (q.options || []);
-      const labels = q.allowOther ? [...base, "Other"] : [...base];
+    if (q.type === "yesno" || q.type === "multiple" || q.type === "imagechoice") {
+      const base = q.type === "yesno" ? ["Yes", "No"]
+        : q.type === "imagechoice" ? (q.images || []).filter((im) => im.src).map((im, ix) => im.label || "Option " + (ix + 1))
+        : (q.options || []);
+      const labels = q.allowOther && q.type !== "imagechoice" ? [...base, "Other"] : [...base];
       const counts = countBy(values);
       const data = labels.map((l) => counts.get(l) || 0);
       // catch answers for options that were later removed
@@ -192,7 +195,7 @@ function renderCharts() {
           datasets: [{
             data,
             backgroundColor: labels.map((_, j) => PALETTE[j % PALETTE.length]),
-            borderColor: "#161514",
+            borderColor: "#000000",
             borderWidth: 2,
           }],
         },
@@ -200,9 +203,24 @@ function renderCharts() {
           indexAxis: doughnut ? undefined : "y",
           maintainAspectRatio: false,
           plugins: { legend: { display: doughnut, position: "bottom" } },
-          scales: doughnut ? {} : { x: { ticks: { precision: 0 }, grid: { color: "#e8e2d4" } }, y: { grid: { display: false } } },
+          scales: doughnut ? {} : { x: { ticks: { precision: 0 }, grid: { color: "#e4e4e2" } }, y: { grid: { display: false } } },
         },
       }));
+      if (q.type === "imagechoice") {
+        const row = document.createElement("div");
+        row.className = "thumb-row";
+        (q.images || []).filter((im) => im.src).forEach((im, ix) => {
+          const fig = document.createElement("figure");
+          const t = document.createElement("img");
+          t.src = im.src;
+          t.alt = "";
+          const cap = document.createElement("figcaption");
+          cap.textContent = im.label || "Option " + (ix + 1);
+          fig.append(t, cap);
+          row.append(fig);
+        });
+        card.append(row);
+      }
     } else if (q.type === "slider" || q.type === "number") {
       const nums = values.map(Number).filter((n) => !Number.isNaN(n));
       const min = q.min ?? (nums.length ? Math.min(...nums) : 0);
@@ -223,12 +241,12 @@ function renderCharts() {
         type: "bar",
         data: {
           labels,
-          datasets: [{ data, backgroundColor: "#ffd23f", borderColor: "#161514", borderWidth: 2 }],
+          datasets: [{ data, backgroundColor: "#D7DF21", borderColor: "#000000", borderWidth: 2 }],
         },
         options: {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: { y: { ticks: { precision: 0 }, grid: { color: "#e8e2d4" } }, x: { grid: { display: false } } },
+          scales: { y: { ticks: { precision: 0 }, grid: { color: "#e4e4e2" } }, x: { grid: { display: false } } },
         },
       }));
     }
@@ -283,7 +301,40 @@ const TYPE_LABELS = {
   yesno: "Yes / No",
   slider: "Slider",
   number: "Numerical",
+  imagechoice: "Image choice (pick one)",
 };
+
+// Client-side resize so photos stay small enough to live in the database.
+function resizeImage(file, maxDim = 500, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Couldn't read that image file."));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error("Couldn't read that file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+$("#addImageExampleBtn").addEventListener("click", () => {
+  const copy = JSON.parse(JSON.stringify(EXAMPLE_IMAGE_QUESTION));
+  copy.id = "q" + Date.now();
+  copy.order = QUESTIONS.length + 1;
+  QUESTIONS.push(copy);
+  renderBuilder();
+  const items = $$(".builder-item");
+  items[items.length - 1]?.scrollIntoView({ behavior: "smooth", block: "center" });
+});
 
 $("#addQuestionBtn").addEventListener("click", () => {
   QUESTIONS.push({
@@ -366,6 +417,88 @@ function builderItem(q, i) {
       opts.innerHTML = `
         <div class="field" style="grid-column:1/-1;"><label>Placeholder text (optional)</label>
         <input type="text" data-field="placeholder" value="${escapeHtml(q.placeholder || "")}" placeholder="e.g. Your answer"></div>`;
+    } else if (q.type === "imagechoice") {
+      if (!q.images) q.images = [{ label: "", src: "" }, { label: "", src: "" }];
+      const holder = document.createElement("div");
+      holder.className = "field";
+      holder.style.gridColumn = "1/-1";
+      holder.innerHTML = `<label>Images (2–6) — upload from your computer; they're resized automatically</label>`;
+      const list = document.createElement("div");
+      list.className = "img-slots";
+      holder.append(list);
+      const addImg = document.createElement("button");
+      addImg.type = "button";
+      addImg.className = "btn btn--ghost btn--sm";
+      addImg.style.marginTop = "10px";
+      addImg.textContent = "+ Add an image slot";
+      addImg.addEventListener("click", () => {
+        if (q.images.length >= 6) return;
+        q.images.push({ label: "", src: "" });
+        drawSlots();
+      });
+      holder.append(addImg);
+      opts.append(holder);
+
+      function drawSlots() {
+        list.innerHTML = "";
+        addImg.style.display = q.images.length >= 6 ? "none" : "";
+        q.images.forEach((im, idx) => {
+          const slot = document.createElement("div");
+          slot.className = "img-slot";
+
+          if (im.src) {
+            const th = document.createElement("img");
+            th.className = "img-slot-thumb";
+            th.src = im.src;
+            th.alt = "";
+            slot.append(th);
+          } else {
+            const ph = document.createElement("div");
+            ph.className = "img-slot-empty";
+            ph.textContent = "no image";
+            slot.append(ph);
+          }
+
+          const label = document.createElement("input");
+          label.type = "text";
+          label.placeholder = "Label (shows in results)";
+          label.value = im.label || "";
+          label.addEventListener("input", () => (im.label = label.value));
+          slot.append(label);
+
+          const file = document.createElement("input");
+          file.type = "file";
+          file.accept = "image/*";
+          file.hidden = true;
+          file.addEventListener("change", async () => {
+            if (!file.files[0]) return;
+            try {
+              im.src = await resizeImage(file.files[0]);
+              drawSlots();
+            } catch (err) { alert(err.message); }
+          });
+          slot.append(file);
+
+          const up = document.createElement("button");
+          up.type = "button";
+          up.className = "btn btn--sun btn--sm";
+          up.textContent = im.src ? "Replace" : "Upload";
+          up.addEventListener("click", () => file.click());
+          slot.append(up);
+
+          const rm = document.createElement("button");
+          rm.type = "button";
+          rm.className = "icon-btn";
+          rm.title = "Remove this image";
+          rm.setAttribute("aria-label", "Remove this image");
+          rm.textContent = "\u2715";
+          rm.addEventListener("click", () => { q.images.splice(idx, 1); drawSlots(); });
+          slot.append(rm);
+
+          list.append(slot);
+        });
+      }
+      drawSlots();
     }
   }
   renderTypeFields();
@@ -382,6 +515,7 @@ function builderItem(q, i) {
   head.querySelector('[data-field="type"]').addEventListener("change", (e) => {
     q.type = e.target.value;
     if (q.type === "multiple" && !q.options) q.options = ["Option 1", "Option 2"];
+    if (q.type === "imagechoice" && !q.images) q.images = [{ label: "", src: "" }, { label: "", src: "" }];
     if (q.type === "slider") { q.min = q.min ?? 1; q.max = q.max ?? 5; }
     renderTypeFields();
   });
@@ -409,6 +543,19 @@ $("#saveQuestionsBtn").addEventListener("click", async () => {
   if (missing.length) {
     status.textContent = "Every question needs a title before saving.";
     return;
+  }
+  for (const q of QUESTIONS) {
+    if (q.type === "imagechoice") {
+      q.images = (q.images || []).filter((im) => im.src); // drop empty slots
+      if (q.images.length < 2) {
+        status.textContent = `"${q.title}" needs at least 2 uploaded images.`;
+        return;
+      }
+      if (JSON.stringify(q).length > 900000) {
+        status.textContent = `"${q.title}" has too much image data — remove an image or upload smaller ones.`;
+        return;
+      }
+    }
   }
   QUESTIONS.forEach((q, n) => (q.order = n + 1));
   status.textContent = "Saving...";

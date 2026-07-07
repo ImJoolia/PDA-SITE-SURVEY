@@ -60,6 +60,9 @@ function makeDemoResponses(questions, n = 26) {
         } else {
           answers[q.id] = rand() < 0.6 ? "Yes" : "No";
         }
+      } else if (q.type === "imagechoice") {
+        const labels = (q.images || []).map((im, ix) => im.label || "Option " + (ix + 1));
+        if (labels.length) answers[q.id] = pick(labels);
       } else if (q.type === "slider" || q.type === "number") {
         const min = q.min ?? 1, max = q.max ?? 5;
         answers[q.id] = Math.round(min + rand() * (max - min));

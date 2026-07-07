@@ -70,6 +70,23 @@ function renderQuestion(q, i) {
     body.append(choiceRow(q, ["Yes", "No"], "choice-row choices"));
   } else if (q.type === "multiple") {
     body.append(choiceRow(q, q.options || [], "choices"));
+  } else if (q.type === "imagechoice") {
+    const grid = el("div", { class: "img-choices", role: "radiogroup", "aria-label": q.title });
+    (q.images || []).filter((im) => im.src).forEach((img, idx) => {
+      const name = img.label || "Option " + (idx + 1);
+      const btn = el("button", { type: "button", class: "img-choice", "aria-pressed": "false" },
+        el("img", { src: img.src, alt: name }),
+        el("span", { class: "img-choice-label" }, name));
+      btn.addEventListener("click", () => {
+        grid.querySelectorAll(".img-choice").forEach((b) => { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
+        btn.classList.add("selected");
+        btn.setAttribute("aria-pressed", "true");
+        grid.dataset.value = name;
+        card.classList.remove("q-error");
+      });
+      grid.append(btn);
+    });
+    body.append(grid);
   } else if (q.type === "slider") {
     const min = q.min ?? 1, max = q.max ?? 5;
     const start = Math.round((min + max) / 2);
@@ -126,6 +143,8 @@ function collect() {
         const otherText = ($("#" + q.id + "_other")?.value || "").trim();
         answers[q.id + "_other"] = otherText;
       }
+    } else if (q.type === "imagechoice") {
+      value = card.querySelector(".img-choices")?.dataset.value ?? null;
     } else if (q.type === "slider") {
       const range = $("#" + q.id);
       value = range.dataset.touched ? Number(range.value) : Number(range.value);
