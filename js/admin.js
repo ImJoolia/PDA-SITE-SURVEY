@@ -7,7 +7,7 @@ import { EXAMPLE_IMAGE_QUESTION } from "./defaults.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 
-$("#marqueeTrack").textContent = "Staff only 〰️ Yay for data! 〰️ SITE Survey 2026 〰️ ".repeat(8);
+$("#marqueeTrack").textContent = "Staff only 〰️ Yay for data! 〰️ Summer of Participatory Planning + Visioning at SITE Santa Fe 〰️ SITE Survey 2026 〰️ ".repeat(8);
 
 const PALETTE = ["#D7DF21", "#25BEC0", "#ED217C", "#25AAE1", "#8CC63F", "#8685C0", "#0F416F", "#9F2064"];
 const chartFont = { family: "'Josefin Sans', sans-serif", size: 12 };

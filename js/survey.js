@@ -3,7 +3,7 @@ import { loadQuestions, submitResponse, isDemo } from "./db.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 
 // ---------- marquee ----------
-const phrases = "Yay for PDA! 〰️ SITE Survey 2026 〰️ Tell us everything 〰️ ";
+const phrases = "Yay for PDA! 〰️ SITE Survey 2026 〰️ Summer of Participatory Planning + Visioning at SITE Santa Fe 〰️ Tell us everything 〰️ ";
 $("#marqueeTrack").textContent = phrases.repeat(8);
 
 if (isDemo) $("#demoBanner").hidden = false;
