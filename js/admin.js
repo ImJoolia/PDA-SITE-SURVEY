@@ -2,7 +2,7 @@ import {
   loadQuestions, saveQuestions, loadResponses, deleteResponse, deleteAllResponses,
   getPasswordHash, setPasswordHash, seedDatabase, sha256, isDemo,
 } from "./db.js";
-import { EXAMPLE_IMAGE_QUESTION } from "./defaults.js";
+import { EXAMPLE_IMAGE_QUESTION, DEFAULT_QUESTIONS } from "./defaults.js";
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
@@ -415,6 +415,12 @@ function resizeImage(file, maxDim = 500, quality = 0.78) {
     reader.readAsDataURL(file);
   });
 }
+
+$("#resetQuestionsBtn").addEventListener("click", () => {
+  if (!confirm("Replace the questions in this editor with the 13 starter questions? Nothing changes for visitors until you press Save all questions.")) return;
+  QUESTIONS = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  renderBuilder();
+});
 
 $("#addImageExampleBtn").addEventListener("click", () => {
   const copy = JSON.parse(JSON.stringify(EXAMPLE_IMAGE_QUESTION));

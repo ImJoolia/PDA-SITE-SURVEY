@@ -77,7 +77,7 @@ body {
 }
 .marquee__track {
   display: inline-block;
-  animation: marquee 28s linear infinite;
+  animation: marquee 60s linear infinite;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1rem;
@@ -153,7 +153,7 @@ body {
   line-height: 1.05;
   margin: 18px 0 10px;
 }
-.hero p { color: var(--ink-soft); max-width: 56ch; margin: 0 0 6px; }
+.hero p { color: #2b2b2b; font-weight: 600; max-width: 62ch; margin: 0 0 14px; }
 
 .squiggle {
   display: block;

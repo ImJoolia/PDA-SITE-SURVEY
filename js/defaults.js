@@ -1,100 +1,130 @@
-// The 15 starter questions, transcribed from SITE Survey 2026_Draft.
-// Question types: "short" | "multiple" | "yesno" | "slider" | "number"
+// Starter questions — mirrors the live SITE x PDA survey (13 questions,
+// same order and wording). The two image questions ship with labeled
+// placeholder tiles; staff replace them with real photos via Upload.
+// Question types: "short" | "multiple" | "yesno" | "slider" | "number" | "imagechoice"
 
 export const DEFAULT_PASSWORD = "yaypda";
 
-// Tiny built-in placeholder images (SVG data URLs) for the example
-// image-choice question. Staff replace these with real photos via the
-// Upload button in the dashboard's Questions tab.
 const tile = (bg, shape) =>
   "data:image/svg+xml," +
   encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150"><rect width="200" height="150" fill="${bg}"/>${shape}</svg>`);
 
+const label = (bg, fg, text) =>
+  tile(bg, `<text x="100" y="88" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="${fg}">${text}</text>`);
+
+// Placeholders — replace with the real photos via Upload in the Questions tab.
+const ARRIVAL_IMAGES = [
+  { label: "Car",     src: label("#D7DF21", "#000000", "CAR") },
+  { label: "Train",   src: label("#25BEC0", "#ffffff", "TRAIN") },
+  { label: "Bus",     src: label("#ED217C", "#ffffff", "BUS") },
+  { label: "Walking", src: label("#0F416F", "#ffffff", "WALK") },
+  { label: "Biking",  src: label("#8CC63F", "#000000", "BIKE") },
+  { label: "Scooter", src: label("#8685C0", "#ffffff", "SCOOT") },
+];
+
+const SPACE_IMAGES = [
+  { label: "1", src: label("#D7DF21", "#000000", "1") },
+  { label: "2", src: label("#25BEC0", "#ffffff", "2") },
+  { label: "3", src: label("#ED217C", "#ffffff", "3") },
+  { label: "4", src: label("#0F416F", "#ffffff", "4") },
+  { label: "5", src: label("#8CC63F", "#000000", "5") },
+  { label: "6", src: label("#8685C0", "#ffffff", "6") },
+];
+
+const FEELING_IMAGES = [
+  { label: "Calm",       src: tile("#0F416F", '<circle cx="100" cy="75" r="42" fill="#25BEC0"/>') },
+  { label: "Curious",    src: tile("#D7DF21", '<circle cx="66" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="100" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="134" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/>') },
+  { label: "Energized",  src: tile("#ED217C", '<path d="M20 110 L60 40 L100 110 L140 40 L180 110" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>') },
+  { label: "Reflective", src: tile("#25BEC0", '<path d="M45 130 A55 55 0 0 1 155 130 Z" fill="#ffffff"/>') },
+  { label: "Playful",    src: tile("#8685C0", '<g fill="#D7DF21"><circle cx="50" cy="45" r="12"/><circle cx="100" cy="45" r="12"/><circle cx="150" cy="45" r="12"/><circle cx="50" cy="105" r="12"/><circle cx="100" cy="105" r="12"/><circle cx="150" cy="105" r="12"/></g>') },
+  { label: "Rushed",     src: tile("#000000", '<g stroke="#D7DF21" stroke-width="9" stroke-linecap="round"><line x1="30" y1="120" x2="90" y2="30"/><line x1="80" y1="120" x2="140" y2="30"/><line x1="130" y1="120" x2="190" y2="30"/></g>') },
+];
+
+// Template for the "+ Add the example image question" button in the dashboard.
 export const EXAMPLE_IMAGE_QUESTION = {
-  id: "q16", order: 16, type: "imagechoice", required: false,
-  title: "Which image feels closest to how your visit felt?",
-  images: [
-    { label: "Calm",       src: tile("#0F416F", '<circle cx="100" cy="75" r="42" fill="#25BEC0"/>') },
-    { label: "Curious",    src: tile("#D7DF21", '<circle cx="66" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="100" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/><circle cx="134" cy="75" r="28" fill="none" stroke="#000000" stroke-width="7"/>') },
-    { label: "Energized",  src: tile("#ED217C", '<path d="M20 110 L60 40 L100 110 L140 40 L180 110" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>') },
-    { label: "Reflective", src: tile("#25BEC0", '<path d="M45 130 A55 55 0 0 1 155 130 Z" fill="#ffffff"/>') },
-    { label: "Playful",    src: tile("#8685C0", '<g fill="#D7DF21"><circle cx="50" cy="45" r="12"/><circle cx="100" cy="45" r="12"/><circle cx="150" cy="45" r="12"/><circle cx="50" cy="105" r="12"/><circle cx="100" cy="105" r="12"/><circle cx="150" cy="105" r="12"/></g>') },
-    { label: "Rushed",     src: tile("#000000", '<g stroke="#D7DF21" stroke-width="9" stroke-linecap="round"><line x1="30" y1="120" x2="90" y2="30"/><line x1="80" y1="120" x2="140" y2="30"/><line x1="130" y1="120" x2="190" y2="30"/></g>') },
-  ],
+  id: "x-feeling", order: 99, type: "imagechoice", required: false,
+  title: "Which image feels closest to your typical SITE visit?",
+  images: FEELING_IMAGES,
 };
 
 export const DEFAULT_QUESTIONS = [
   {
-    id: "q01", order: 1, type: "short", required: true,
+    id: "c01", order: 1, type: "short", required: false,
     title: "Email",
     placeholder: "you@example.com",
   },
   {
-    id: "q02", order: 2, type: "multiple", required: true,
-    title: "How many times have you visited SITE Santa Fe?",
-    options: ["0", "1", "2-4", "5-9", "10+"], allowOther: false,
-  },
-  {
-    id: "q03", order: 3, type: "multiple", required: true,
-    title: "How many museums do you visit in a typical year?",
-    options: ["0", "1", "2-4", "5-9", "10+"], allowOther: false,
-  },
-  {
-    id: "q04", order: 4, type: "multiple", required: true,
-    title: "How far do you travel to visit SITE Santa Fe?",
-    options: ["5 miles or less", "5-20 miles", "20-50 miles", "50+ miles"], allowOther: false,
-  },
-  {
-    id: "q05", order: 5, type: "multiple", required: true,
+    id: "c02", order: 2, type: "multiple", required: true,
     title: "What brings you to SITE Santa Fe...",
     options: ["Art", "An event", "Curiosity", "I just like to pass by", "Friends or Family", "It's Free!"],
     allowOther: true,
   },
   {
-    id: "q06", order: 6, type: "yesno", required: true,
+    id: "c03", order: 3, type: "yesno", required: true,
     title: "Are you a SITE Santa Fe member?", allowOther: false,
   },
   {
-    id: "q07", order: 7, type: "multiple", required: true,
-    title: "How many photos do you typically take during your visits?",
-    options: ["0", "1-5", "6-15", "15+"], allowOther: false,
+    id: "c04", order: 4, type: "multiple", required: true,
+    title: "How many times have you been to SITE Santa Fe?",
+    options: ["0", "1", "2-5", "5-10", "10+"], allowOther: false,
   },
   {
-    id: "q08", order: 8, type: "yesno", required: true,
-    title: "Do you typically leave your belongings at the front desk cubbies?", allowOther: false,
+    id: "c05", order: 5, type: "imagechoice", required: true,
+    title: "How do you arrive to SITE?",
+    images: ARRIVAL_IMAGES,
   },
   {
-    id: "q09", order: 9, type: "yesno", required: true,
-    title: "Do you typically visit the bathroom? If not, please specify", allowOther: true,
-  },
-  {
-    id: "q10", order: 10, type: "yesno", required: true,
-    title: "Do you typically attend with a specific exhibition in mind?", allowOther: false,
-  },
-  {
-    id: "q11", order: 11, type: "multiple", required: true,
-    title: "How many times do you typically ask someone for directions?",
-    options: ["Once", "Twice", "More than twice"], allowOther: false,
-  },
-  {
-    id: "q12", order: 12, type: "multiple", required: true,
-    title: "How often do you visit SITE Santa Fe in a month?",
-    options: ["Once", "Twice", "More than twice"], allowOther: true,
-  },
-  {
-    id: "q13", order: 13, type: "multiple", required: true,
-    title: "Are your visits often relaxed or rushed? If rushed, why?",
-    options: ["Relaxed", "Rushed"], allowOther: true,
-  },
-  {
-    id: "q14", order: 14, type: "slider", required: true,
-    title: "How comfortable are you in the space? Lighting? Seating? Temperature?...",
-    min: 1, max: 5, minLabel: "I am comfortable", maxLabel: "I am uncomfortable",
-  },
-  {
-    id: "q15", order: 15, type: "short", required: false,
-    title: "If uncomfortable, why?",
+    id: "c06", order: 6, type: "short", required: false,
+    title: "If any, type additional or other methods on you arrived:",
     placeholder: "Your answer",
   },
-  EXAMPLE_IMAGE_QUESTION,
+  {
+    id: "c07", order: 7, type: "yesno", required: true,
+    title: "Do you know where the restrooms are located?", allowOther: false,
+  },
+  {
+    id: "c08", order: 8, type: "yesno", required: true,
+    title: "Do you leave your belongings at the front desk cubbies?", allowOther: false,
+  },
+  {
+    id: "c09", order: 9, type: "yesno", required: true,
+    title: "Do you find SITE Santa Fe easy to navigate?", allowOther: false,
+  },
+  {
+    id: "c10", order: 10, type: "short", required: false,
+    title: "If not, why?",
+    placeholder: "Your answer",
+  },
+  {
+    id: "c11", order: 11, type: "imagechoice", required: false,
+    title: "Which museum space resonates with you most?",
+    images: SPACE_IMAGES,
+  },
+  {
+    id: "c12", order: 12, type: "multiple", required: true,
+    title: "I wish SITE Santa Fe had...",
+    options: [
+      "CHILDREN'S AREA",
+      "MORE SEATING & RESTING AREAS",
+      "OUTDOOR SPACE",
+      "GARDEN/ PLANTS",
+      "QUIET & STUDY AREAS",
+      "CAFE/COFFEE SHOP",
+      "MORE NATURAL LIGHT",
+      "FREE COMMUNITY EVENTS & ACTIVITY",
+      "BETTER PARKING",
+      "MORE SIGNS - GUIDES ON SIDEWALKS, BETTER LABELING OF SPACES",
+      "BAR/ ADULT SPACE",
+      "MORE INTERACTIVE OR LIVE INSTALLATIONS",
+      "CLEARER MAIN ENTRANCE",
+      "GIFT SHOP",
+      "ART EXHIBIT GUIDE",
+    ],
+    allowOther: true,
+  },
+  {
+    id: "c13", order: 13, type: "short", required: false,
+    title: "Please list any additional spaces that you wished SITE Santa Fe Had:",
+    placeholder: "Your answer",
+  },
 ];
