@@ -559,3 +559,33 @@ input[type="range"]::-moz-range-thumb {
 .resp-answers { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
 .resp-answers li { background: var(--paper); border: 1.5px solid var(--ink); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.9rem; }
 .resp-answers li b { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+
+/* ---------- Ranking questions ---------- */
+.rank-list { display: flex; flex-direction: column; gap: 10px; }
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  padding: 8px 12px;
+}
+.rank-num {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chartreuse);
+  border: var(--border);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.rank-thumb { width: 64px; height: 48px; object-fit: cover; border: 1.5px solid var(--ink); border-radius: 6px; }
+.rank-label { flex: 1; font-weight: 600; min-width: 0; }
+.rank-btns { display: flex; gap: 6px; }
+.icon-btn:disabled { opacity: 0.3; cursor: default; }

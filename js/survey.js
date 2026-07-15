@@ -3,7 +3,7 @@ import { loadQuestions, submitResponse, isDemo } from "./db.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 
 // ---------- marquee ----------
-const phrases = "Yay for PDA! 〰️ SITE Survey 2026 〰️ Summer of Participatory Planning + Visioning at SITE Santa Fe 〰️ Tell us everything 〰️ ";
+const phrases = "Yay for PDA! 〰️ SITE Survey 2026 〰️ Summer of Participatory Planning + Visioning at SITE SANTA FE 〰️ Tell us everything 〰️ ";
 $("#marqueeTrack").textContent = phrases.repeat(8);
 
 if (isDemo) $("#demoBanner").hidden = false;
@@ -87,6 +87,38 @@ function renderQuestion(q, i) {
       grid.append(btn);
     });
     body.append(grid);
+  } else if (q.type === "ranking") {
+    const items = (q.items || []).filter((it) => it.label);
+    // Shuffle the starting order so early-listed options don't get a head start
+    const current = [...items];
+    for (let i = current.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [current[i], current[j]] = [current[j], current[i]];
+    }
+    const list = el("div", { class: "rank-list", role: "list" });
+    function drawRanks() {
+      list.innerHTML = "";
+      current.forEach((it, idx) => {
+        const row = el("div", { class: "rank-row", role: "listitem" });
+        row.append(el("span", { class: "rank-num", "aria-hidden": "true" }, String(idx + 1)));
+        if (it.src) row.append(el("img", { class: "rank-thumb", src: it.src, alt: "" }));
+        row.append(el("span", { class: "rank-label" }, it.label));
+        const btns = el("span", { class: "rank-btns" });
+        const up = el("button", { type: "button", class: "icon-btn", "aria-label": "Move " + it.label + " up" }, "\u2191");
+        const down = el("button", { type: "button", class: "icon-btn", "aria-label": "Move " + it.label + " down" }, "\u2193");
+        up.disabled = idx === 0;
+        down.disabled = idx === current.length - 1;
+        up.addEventListener("click", () => { [current[idx - 1], current[idx]] = [current[idx], current[idx - 1]]; drawRanks(); });
+        down.addEventListener("click", () => { [current[idx + 1], current[idx]] = [current[idx], current[idx + 1]]; drawRanks(); });
+        btns.append(up, down);
+        row.append(btns);
+        list.append(row);
+      });
+      list.dataset.value = JSON.stringify(current.map((it) => it.label));
+    }
+    drawRanks();
+    body.append(el("p", { class: "hint", style: "margin:0 0 10px;" }, "Use the arrows to order these from your favorite (top) to your least favorite (bottom)."));
+    body.append(list);
   } else if (q.type === "slider") {
     const min = q.min ?? 1, max = q.max ?? 5;
     const start = Math.round((min + max) / 2);
@@ -145,6 +177,9 @@ function collect() {
       }
     } else if (q.type === "imagechoice") {
       value = card.querySelector(".img-choices")?.dataset.value ?? null;
+    } else if (q.type === "ranking") {
+      const raw = card.querySelector(".rank-list")?.dataset.value;
+      value = raw ? JSON.parse(raw) : null;
     } else if (q.type === "slider") {
       const range = $("#" + q.id);
       value = range.dataset.touched ? Number(range.value) : Number(range.value);

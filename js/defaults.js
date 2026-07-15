@@ -54,18 +54,24 @@ export const DEFAULT_QUESTIONS = [
     placeholder: "you@example.com",
   },
   {
-    id: "c02", order: 2, type: "multiple", required: true,
-    title: "What brings you to SITE Santa Fe...",
-    options: ["Art", "An event", "Curiosity", "I just like to pass by", "Friends or Family", "It's Free!"],
-    allowOther: true,
+    id: "c02", order: 2, type: "ranking", required: true,
+    title: "What brings you to SITE SANTA FE... (rank from most to least)",
+    items: [
+      { label: "Art", src: "" },
+      { label: "An event", src: "" },
+      { label: "Curiosity", src: "" },
+      { label: "I just like to pass by", src: "" },
+      { label: "Friends or Family", src: "" },
+      { label: "It's Free!", src: "" },
+    ],
   },
   {
     id: "c03", order: 3, type: "yesno", required: true,
-    title: "Are you a SITE Santa Fe member?", allowOther: false,
+    title: "Are you a SITE SANTA FE member?", allowOther: false,
   },
   {
     id: "c04", order: 4, type: "multiple", required: true,
-    title: "How many times have you been to SITE Santa Fe?",
+    title: "How many times have you been to SITE SANTA FE?",
     options: ["0", "1", "2-5", "5-10", "10+"], allowOther: false,
   },
   {
@@ -88,7 +94,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     id: "c09", order: 9, type: "yesno", required: true,
-    title: "Do you find SITE Santa Fe easy to navigate?", allowOther: false,
+    title: "Do you find SITE SANTA FE easy to navigate?", allowOther: false,
   },
   {
     id: "c10", order: 10, type: "short", required: false,
@@ -96,13 +102,13 @@ export const DEFAULT_QUESTIONS = [
     placeholder: "Your answer",
   },
   {
-    id: "c11", order: 11, type: "imagechoice", required: false,
-    title: "Which museum space resonates with you most?",
-    images: SPACE_IMAGES,
+    id: "c11", order: 11, type: "ranking", required: false,
+    title: "Which museum space resonates with you most? (rank from most to least)",
+    items: SPACE_IMAGES,
   },
   {
     id: "c12", order: 12, type: "multiple", required: true,
-    title: "I wish SITE Santa Fe had...",
+    title: "I wish SITE SANTA FE had...",
     options: [
       "CHILDREN'S AREA",
       "MORE SEATING & RESTING AREAS",
@@ -124,7 +130,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     id: "c13", order: 13, type: "short", required: false,
-    title: "Please list any additional spaces that you wished SITE Santa Fe Had:",
+    title: "Please list any additional spaces that you wished SITE SANTA FE Had:",
     placeholder: "Your answer",
   },
 ];

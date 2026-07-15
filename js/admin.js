@@ -7,7 +7,7 @@ import { EXAMPLE_IMAGE_QUESTION, DEFAULT_QUESTIONS } from "./defaults.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 
-$("#marqueeTrack").textContent = "Staff only 〰️ Yay for data! 〰️ Summer of Participatory Planning + Visioning at SITE Santa Fe 〰️ SITE Survey 2026 〰️ ".repeat(8);
+$("#marqueeTrack").textContent = "Staff only 〰️ Yay for data! 〰️ Summer of Participatory Planning + Visioning at SITE SANTA FE 〰️ SITE Survey 2026 〰️ ".repeat(8);
 
 const PALETTE = ["#D7DF21", "#25BEC0", "#ED217C", "#25AAE1", "#8CC63F", "#8685C0", "#0F416F", "#9F2064"];
 const chartFont = { family: "'Josefin Sans', sans-serif", size: 12 };
@@ -222,6 +222,53 @@ function renderCharts() {
         });
         card.append(row);
       }
+    } else if (q.type === "ranking") {
+      const items = (q.items || []).filter((it) => it.label);
+      const sums = new Map(), counts = new Map();
+      values.forEach((v) => {
+        if (!Array.isArray(v)) return;
+        v.forEach((lab, i) => {
+          sums.set(lab, (sums.get(lab) || 0) + i + 1);
+          counts.set(lab, (counts.get(lab) || 0) + 1);
+        });
+      });
+      const rows = items.map((it) => ({
+        label: it.label,
+        avg: counts.get(it.label) ? sums.get(it.label) / counts.get(it.label) : null,
+      })).sort((a, b) => (a.avg ?? 999) - (b.avg ?? 999));
+      card.querySelector(".chart-meta").textContent += " \u00b7 average rank \u2014 1 = favorite";
+      charts.push(new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: rows.map((r) => r.label),
+          datasets: [{
+            data: rows.map((r) => (r.avg === null ? 0 : Math.round(r.avg * 100) / 100)),
+            backgroundColor: rows.map((_, j) => PALETTE[j % PALETTE.length]),
+            borderColor: "#000000",
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { precision: 0 }, grid: { color: "#e4e4e2" } }, y: { grid: { display: false } } },
+        },
+      }));
+      if (items.some((it) => it.src)) {
+        const row = document.createElement("div");
+        row.className = "thumb-row";
+        items.filter((it) => it.src).forEach((it) => {
+          const fig = document.createElement("figure");
+          const t = document.createElement("img");
+          t.src = it.src; t.alt = "";
+          const cap = document.createElement("figcaption");
+          cap.textContent = it.label;
+          fig.append(t, cap);
+          row.append(fig);
+        });
+        card.append(row);
+      }
     } else if (q.type === "slider" || q.type === "number") {
       const nums = values.map(Number).filter((n) => !Number.isNaN(n));
       const min = q.min ?? (nums.length ? Math.min(...nums) : 0);
@@ -308,7 +355,7 @@ function renderResponseList() {
       const b = document.createElement("b");
       b.textContent = q.title;
       li.append(b);
-      let text = String(v);
+      let text = Array.isArray(v) ? v.join(" \u2192 ") : String(v);
       const other = r.answers?.[q.id + "_other"];
       if (v === "Other" && other) text += " \u2014 " + other;
       li.append(text);
@@ -372,7 +419,10 @@ $("#exportBtn").addEventListener("click", () => {
   const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const rows = [headers.map(esc).join(",")];
   RESPONSES.forEach((r) => {
-    rows.push(cols.map((c) => esc(c === "submittedAt" ? r.submittedAt : r.answers?.[c])).join(","));
+    rows.push(cols.map((c) => {
+      const raw = c === "submittedAt" ? r.submittedAt : r.answers?.[c];
+      return esc(Array.isArray(raw) ? raw.join(" > ") : raw);
+    }).join(","));
   });
   const blob = new Blob([rows.join("\n")], { type: "text/csv" });
   const a = document.createElement("a");
@@ -392,6 +442,7 @@ const TYPE_LABELS = {
   slider: "Slider",
   number: "Numerical",
   imagechoice: "Image choice (pick one)",
+  ranking: "Ranking (favorite to least)",
 };
 
 // Client-side resize so photos stay small enough to live in the database.
@@ -513,6 +564,80 @@ function builderItem(q, i) {
       opts.innerHTML = `
         <div class="field" style="grid-column:1/-1;"><label>Placeholder text (optional)</label>
         <input type="text" data-field="placeholder" value="${escapeHtml(q.placeholder || "")}" placeholder="e.g. Your answer"></div>`;
+    } else if (q.type === "ranking") {
+      if (!q.items) q.items = [{ label: "", src: "" }, { label: "", src: "" }];
+      const holder = document.createElement("div");
+      holder.className = "field";
+      holder.style.gridColumn = "1/-1";
+      holder.innerHTML = `<label>Items to rank (2\u20138) \u2014 top of this list is shown first; visitors see them shuffled. Photos optional.</label>`;
+      const list = document.createElement("div");
+      list.className = "img-slots";
+      holder.append(list);
+      const addItem = document.createElement("button");
+      addItem.type = "button";
+      addItem.className = "btn btn--ghost btn--sm";
+      addItem.style.marginTop = "10px";
+      addItem.textContent = "+ Add an item";
+      addItem.addEventListener("click", () => {
+        if (q.items.length >= 8) return;
+        q.items.push({ label: "", src: "" });
+        drawItems();
+      });
+      holder.append(addItem);
+      opts.append(holder);
+
+      function drawItems() {
+        list.innerHTML = "";
+        addItem.style.display = q.items.length >= 8 ? "none" : "";
+        q.items.forEach((im, idx) => {
+          const slot = document.createElement("div");
+          slot.className = "img-slot";
+          if (im.src) {
+            const th = document.createElement("img");
+            th.className = "img-slot-thumb";
+            th.src = im.src;
+            th.alt = "";
+            slot.append(th);
+          } else {
+            const ph = document.createElement("div");
+            ph.className = "img-slot-empty";
+            ph.textContent = "no image";
+            slot.append(ph);
+          }
+          const label = document.createElement("input");
+          label.type = "text";
+          label.placeholder = "Item label (required)";
+          label.value = im.label || "";
+          label.addEventListener("input", () => (im.label = label.value));
+          slot.append(label);
+          const file = document.createElement("input");
+          file.type = "file";
+          file.accept = "image/*";
+          file.hidden = true;
+          file.addEventListener("change", async () => {
+            if (!file.files[0]) return;
+            try { im.src = await resizeImage(file.files[0]); drawItems(); }
+            catch (err) { alert(err.message); }
+          });
+          slot.append(file);
+          const up = document.createElement("button");
+          up.type = "button";
+          up.className = "btn btn--sun btn--sm";
+          up.textContent = im.src ? "Replace" : "Photo";
+          up.addEventListener("click", () => file.click());
+          slot.append(up);
+          const rm = document.createElement("button");
+          rm.type = "button";
+          rm.className = "icon-btn";
+          rm.title = "Remove this item";
+          rm.setAttribute("aria-label", "Remove this item");
+          rm.textContent = "\u2715";
+          rm.addEventListener("click", () => { q.items.splice(idx, 1); drawItems(); });
+          slot.append(rm);
+          list.append(slot);
+        });
+      }
+      drawItems();
     } else if (q.type === "imagechoice") {
       if (!q.images) q.images = [{ label: "", src: "" }, { label: "", src: "" }];
       const holder = document.createElement("div");
@@ -612,6 +737,11 @@ function builderItem(q, i) {
     q.type = e.target.value;
     if (q.type === "multiple" && !q.options) q.options = ["Option 1", "Option 2"];
     if (q.type === "imagechoice" && !q.images) q.images = [{ label: "", src: "" }, { label: "", src: "" }];
+    if (q.type === "ranking" && !q.items) {
+      if (q.options && q.options.length) q.items = q.options.map((o) => ({ label: o, src: "" }));
+      else if (q.images && q.images.length) q.items = JSON.parse(JSON.stringify(q.images));
+      else q.items = [{ label: "", src: "" }, { label: "", src: "" }];
+    }
     if (q.type === "slider") { q.min = q.min ?? 1; q.max = q.max ?? 5; }
     renderTypeFields();
   });
@@ -641,6 +771,17 @@ $("#saveQuestionsBtn").addEventListener("click", async () => {
     return;
   }
   for (const q of QUESTIONS) {
+    if (q.type === "ranking") {
+      q.items = (q.items || []).filter((it) => it.label && it.label.trim());
+      if (q.items.length < 2) {
+        status.textContent = `"${q.title}" needs at least 2 labeled items to rank.`;
+        return;
+      }
+      if (JSON.stringify(q).length > 900000) {
+        status.textContent = `"${q.title}" has too much image data \u2014 remove or shrink some photos.`;
+        return;
+      }
+    }
     if (q.type === "imagechoice") {
       q.images = (q.images || []).filter((im) => im.src); // drop empty slots
       if (q.images.length < 2) {
